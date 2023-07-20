@@ -4,10 +4,10 @@ from th2_grpc_check1.check1_pb2 import CheckRuleRequest
 from th2_grpc_check1.check1_service import Check1Service
 from th2_grpc_common.common_pb2 import Direction, FilterOperation, ConnectionID
 
-from action_handlers.abstract_action_handler import AbstractActionHandler
-from action_handlers.context import Context
-from processors.th2_processor import Th2ProcessorConfig
-from util.util import Action
+from run_one.action_handlers.abstract_action_handler import AbstractActionHandler
+from run_one.action_handlers.context import Context
+from run_one.processors.th2_processor import Th2ProcessorConfig
+from run_one.util.util import Action
 
 
 class TH2Check1Handler(AbstractActionHandler):

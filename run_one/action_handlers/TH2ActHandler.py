@@ -4,10 +4,10 @@ from th2_grpc_act_template.act_service import ActService
 from th2_grpc_act_template.act_template_pb2 import PlaceMessageRequest
 
 
-from action_handlers.abstract_action_handler import AbstractActionHandler
-from action_handlers.context import Context
-from util.util import Action
-from processors.th2_processor import Th2ProcessorConfig
+from run_one.action_handlers.abstract_action_handler import AbstractActionHandler
+from run_one.action_handlers.context import Context
+from run_one.util.util import Action
+from run_one.processors.th2_processor import Th2ProcessorConfig
 
 
 class TH2ActHandler(AbstractActionHandler):

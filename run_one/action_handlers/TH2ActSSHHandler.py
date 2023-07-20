@@ -2,10 +2,10 @@ from th2_common.schema.grpc.router.grpc_router import GrpcRouter
 from th2_grpc_act_ssh.act_ssh_pb2 import ExecutionRequest
 from th2_grpc_act_ssh.act_ssh_service import ActSshService
 
-from action_handlers.abstract_action_handler import AbstractActionHandler
-from action_handlers.context import Context
-from processors.th2_processor import Th2ProcessorConfig
-from util.util import Action
+from run_one.action_handlers.abstract_action_handler import AbstractActionHandler
+from run_one.action_handlers.context import Context
+from run_one.processors.th2_processor import Th2ProcessorConfig
+from run_one.util.util import Action
 
 
 class TH2ActSSHHandler(AbstractActionHandler):

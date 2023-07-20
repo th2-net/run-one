@@ -1,7 +1,7 @@
 import time
 
-from action_handlers.abstract_action_handler import AbstractActionHandler
-from util.util import Action
+from run_one.action_handlers.abstract_action_handler import AbstractActionHandler
+from run_one.util.util import Action
 
 
 class SleepHandler(AbstractActionHandler):

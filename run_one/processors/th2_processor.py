@@ -8,11 +8,11 @@ from th2_common.schema.factory.common_factory import CommonFactory
 from th2_common_utils import create_event, create_event_id
 from th2_grpc_common.common_pb2 import EventBatch
 
-from action_handlers.abstract_action_handler import AbstractActionHandler
-from action_handlers.context import Context
-from processors.abstract_processor import AbstractProcessor
-from util.config import Config
-from util.util import Action
+from run_one.action_handlers.abstract_action_handler import AbstractActionHandler
+from run_one.action_handlers.context import Context
+from run_one.processors.abstract_processor import AbstractProcessor
+from run_one.util.config import Config
+from run_one.util.util import Action
 
 
 class Th2ProcessorConfig:

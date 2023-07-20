@@ -1,0 +1,40 @@
+name: Build and publish Python distributions to PyPI
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - README.md
+
+jobs:
+  build-n-publish:
+    name: Build and Python distributions to PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Run tests
+        run: |
+          poetry install
+          poetry run pytest
+      - name: Build package
+        run: poetry build
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_PASSWORD }}
+          repository_url: https://upload.pypi.org/legacy/
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Security vulnerabilities scan
+        uses: aufdenpunkt/python-safety-check@master
+        continue-on-error: true

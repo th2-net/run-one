@@ -6,7 +6,7 @@ import uuid
 
 import pandas as pd
 
-from util.config import Config
+from run_one.util.config import Config
 
 
 uid = str(uuid.uuid1())
