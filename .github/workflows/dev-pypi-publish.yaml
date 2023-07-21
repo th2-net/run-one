@@ -7,33 +7,35 @@ on:
     paths:
       - pyproject.toml
 
+env:
+  DEP_PATH: requirements.txt
+
 jobs:
   build-n-publish:
     name: Dev build and Python distributions to PyPI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      # Prepare custom build version
+      - uses: actions/checkout@v3
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
       - name: Get package version
         id: package_version
-        run: echo '::set-output name=package_version::$(poetry version -s)'
-      - name: Build custom package version
+        run: echo '::set-output name=value::$(poetry version -s)'
+      - name: Build custom release version
         id: release_version
-        run: echo ::set-output name=value::"${{ steps.package_version.outputs.package_version }}.dev${{ github.run_id }}"
-      - name: Show package version
+        run: echo ::set-output name=value::"${{ steps.package_version.outputs.value }}.dev${{ github.run_id }}"
+      - name: Show custom release version
         run: echo ${{ steps.release_version.outputs.value }}
-      - name: Set version for current build in pyproject.toml
+      - name: Set custom release version for current build in pyproject.toml
         run: poetry version ${{ steps.release_version.outputs.value }}
-      # Test
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: '3.10'
       - name: Run tests
         run: |
           poetry install
           poetry run pytest
-      # Build and publish
       - name: Build package
         run: poetry build
       - name: Publish distribution to PyPI
@@ -45,11 +47,11 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out master
-        uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: Install Poetry
         uses: snok/install-poetry@v1
-      - run: poetry export -f requirements.txt --output requirements.txt
+      - name: Export dependency list
+        run: poetry export --without-hashes --output requirements.txt
       - name: Security vulnerabilities scan
         continue-on-error: true
         uses: aufdenpunkt/python-safety-check@master

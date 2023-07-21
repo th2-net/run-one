@@ -7,6 +7,9 @@ on:
     paths-ignore:
       - README.md
 
+env:
+  DEP_PATH: requirements.txt
+
 jobs:
   build-n-publish:
     name: Build and Python distributions to PyPI
@@ -16,7 +19,7 @@ jobs:
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: '3.10'
       - name: Install Poetry
         uses: snok/install-poetry@v1
       - name: Run tests
@@ -35,6 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Export dependency list
+        run: poetry export --without-hashes --output requirements.txt
       - name: Security vulnerabilities scan
-        uses: aufdenpunkt/python-safety-check@master
         continue-on-error: true
+        uses: aufdenpunkt/python-safety-check@master
+        with:
+          scan_requirements_file_only: 'true'
