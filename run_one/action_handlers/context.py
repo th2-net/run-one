@@ -9,3 +9,7 @@ class Context:
     def get(key):
         Context.context.setdefault(key)
         return Context.context.get(key)
+
+    @staticmethod
+    def clear():
+        Context.context.clear()

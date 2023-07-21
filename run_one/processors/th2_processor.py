@@ -44,8 +44,8 @@ class Th2ProcessorConfig:
 
 
 class Th2Processor(AbstractProcessor):
-    def __init__(self, config: Config):
-        self._config = Th2ProcessorConfig(**config.processor_config)
+    def __init__(self, config: Config, processor_config_class=Th2ProcessorConfig):
+        self._config = processor_config_class(**config.processor_config)
 
         self._common_factory = CommonFactory(config_path=self._config.th2_configs)
 
@@ -100,6 +100,8 @@ class Th2Processor(AbstractProcessor):
 
             for handler in self.processed_actions.values():
                 handler.on_test_case_end()
+
+            Context.clear()
 
     def close(self):
         self._common_factory.close()
