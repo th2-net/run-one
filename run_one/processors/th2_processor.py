@@ -88,13 +88,15 @@ class Th2Processor(AbstractProcessor):
                                  f'message type = {current_action.extra_data.get("MessageType", "none")},'
                                  f'description = {current_action.extra_data.get("Description", "empty")}')
 
-                action_handler = self.processed_actions.get(current_action_type)
-                if action_handler is not None:
-                    action_handler.process(action=current_action)
+                current_action_handler = self.processed_actions.get(current_action_type)
 
-                if previous_action is not None \
-                        and action_handler is not self.processed_actions.get(previous_action.extra_data['Action']):
-                    action_handler.on_action_change(previous_action, current_action)
+                if previous_action is not None:
+                    previous_action_handler = self.processed_actions.get(previous_action.extra_data['Action'])
+                    if current_action_handler is not previous_action_handler:
+                        previous_action_handler.on_action_change(previous_action, current_action)
+
+                if current_action_handler is not None:
+                    current_action_handler.process(action=current_action)
 
                 time.sleep(self._config.sleep)
 
