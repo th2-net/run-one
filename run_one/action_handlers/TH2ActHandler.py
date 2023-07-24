@@ -34,7 +34,7 @@ class TH2ActHandler(AbstractActionHandler):
         if not self._config.use_place_method:
             response = self._act_service.sendMessage(message)
         else:
-            response = self._get_act_method(message_type)(message)
+            response = self._get_act_method(message_type)(message, timeout=action.extra_data.get('Time'))
 
         Context.set('checkpoint_id', response.checkpoint_id)
 

@@ -84,7 +84,8 @@ class Th2Processor(AbstractProcessor):
 
             logging.info(f'Processing {test_case_name} test case')
 
-            test_case_root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope)
+            test_case_root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope,
+                                                      start_timestamp=self.create_timestamp())
             test_case_event_batch = EventBatch(events=[create_event(name=test_case_name,
                                                                     event_id=test_case_root_event_id,
                                                                     parent_id=self.root_event_id)])

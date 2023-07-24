@@ -1,3 +1,9 @@
+1.0.4
+-----
+
+* Fix timestamp of test case EventID in `th2_processor`
+* Ability to provide timeout for th2-act place methods
+
 1.0.3
 -----
 
