@@ -58,11 +58,13 @@ class TH2Check1Handler(AbstractActionHandler):
         if checkpoint_id := Context.get('checkpoint_id'):
             check_rule_request.checkpoint.CopyFrom(checkpoint_id)
 
-        chain_id = Context.get('chain_id_mapping')
-        chain_id = chain_id.get(user_and_direction) if chain_id is not None else None
+        chain_id_mapping = Context.get('chain_id_mapping')
+        chain_id = chain_id_mapping.get(user_and_direction) if chain_id_mapping is not None else None
         if chain_id is not None:
             check_rule_request.chain_id.CopyFrom(chain_id)
 
         response = self._check1_service.submitCheckRule(check_rule_request)
-        if chain_id is None:
+        if chain_id_mapping is None:
+            Context.set('chain_id_mapping', {user_and_direction: response.chain_id})
+        else:
             Context.get('chain_id_mapping')[user_and_direction] = response.chain_id

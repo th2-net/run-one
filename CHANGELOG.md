@@ -1,3 +1,8 @@
+1.0.3
+-----
+
+* One more fix for `chain_id` logic in `TH2Check1Handler`
+
 1.0.2
 -----
 
