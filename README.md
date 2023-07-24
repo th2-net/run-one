@@ -41,4 +41,5 @@ processor_config: # processor config in free form
   use_place_method: False # use th2 act place methods (True) or plain send (False)
   key_fields: ["Side", "ClOrdID", "OrigClOrdID"] # list of key fields for th2-check1 request
   sleep: 1 # delay between each action processing
+  timestamp_shift: 1 # for how many seconds to the past make a shift for event timestamps
 ```

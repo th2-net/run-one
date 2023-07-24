@@ -1,12 +1,14 @@
+from datetime import datetime, timedelta
+from itertools import pairwise, chain
 import logging
 import time
-from itertools import pairwise, chain
 from typing import TypeVar
 
+from google.protobuf.timestamp_pb2 import Timestamp
+from th2_grpc_common.common_pb2 import EventBatch
 from th2_common.schema.event.event_batch_router import EventBatchRouter
 from th2_common.schema.factory.common_factory import CommonFactory
 from th2_common_utils import create_event, create_event_id
-from th2_grpc_common.common_pb2 import EventBatch
 
 from run_one.action_handlers.abstract_action_handler import AbstractActionHandler
 from run_one.action_handlers.context import Context
@@ -42,6 +44,10 @@ class Th2ProcessorConfig:
         if 'sleep' in kwargs:
             self.sleep = int(kwargs['sleep'])
 
+        self.timestamp_shift = 0
+        if 'timestamp_shift' in kwargs:
+            self.timestamp_shift = int(kwargs['timestamp_shift'])
+
 
 class Th2Processor(AbstractProcessor):
     def __init__(self, config: Config, processor_config_class=Th2ProcessorConfig):
@@ -50,7 +56,8 @@ class Th2Processor(AbstractProcessor):
         self._common_factory = CommonFactory(config_path=self._config.th2_configs)
 
         self._event_router: EventBatchRouter = self._common_factory.event_batch_router  # type: ignore
-        self.root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope)
+        self.root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope,
+                                             start_timestamp=self.create_timestamp())
         self.root_event = EventBatch(events=[create_event(name='Run One Root Event',
                                                           event_id=self.root_event_id)])
         self._event_router.send(self.root_event)
@@ -65,6 +72,11 @@ class Th2Processor(AbstractProcessor):
                                                           for action, action_handler in action_handlers.items()}
 
         self.logger = logging.getLogger()
+
+    def create_timestamp(self) -> Timestamp:
+        timestamp = Timestamp()
+        timestamp.FromDatetime(datetime.utcnow() - timedelta(seconds=self._config.timestamp_shift))
+        return timestamp
 
     def process(self, test_cases: dict[str, list[Action]]):
 

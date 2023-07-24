@@ -58,7 +58,8 @@ class TH2Check1Handler(AbstractActionHandler):
         if checkpoint_id := Context.get('checkpoint_id'):
             check_rule_request.checkpoint.CopyFrom(checkpoint_id)
 
-        chain_id = Context.get('chain_id_mapping').get(user_and_direction)
+        chain_id = Context.get('chain_id_mapping')
+        chain_id = chain_id.get(user_and_direction) if chain_id is not None else None
         if chain_id is not None:
             check_rule_request.chain_id.CopyFrom(chain_id)
 
