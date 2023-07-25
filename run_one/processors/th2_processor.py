@@ -59,7 +59,8 @@ class Th2Processor(AbstractProcessor):
         self.root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope,
                                              start_timestamp=self.create_timestamp())
         self.root_event = EventBatch(events=[create_event(name='Run One Root Event',
-                                                          event_id=self.root_event_id)])
+                                                          event_id=self.root_event_id,
+                                                          event_type='run-one root event')])
         self._event_router.send(self.root_event)
         Context.set('root_event_id', self.root_event_id)
 
@@ -88,7 +89,8 @@ class Th2Processor(AbstractProcessor):
                                                       start_timestamp=self.create_timestamp())
             test_case_event_batch = EventBatch(events=[create_event(name=test_case_name,
                                                                     event_id=test_case_root_event_id,
-                                                                    parent_id=self.root_event_id)])
+                                                                    parent_id=self.root_event_id,
+                                                                    event_type='Test case root event')])
             self._event_router.send(test_case_event_batch)
             Context.set('parent_event_id', test_case_root_event_id)
 

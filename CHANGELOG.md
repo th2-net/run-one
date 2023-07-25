@@ -1,3 +1,8 @@
+1.0.5
+-----
+
+* Add event types in `th2_processor`
+
 1.0.4
 -----
 
