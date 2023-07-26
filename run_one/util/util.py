@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import datetime
+from itertools import tee
 import json
 from typing import Callable
 import uuid
@@ -95,3 +96,13 @@ def read_csv_matrix(filepath: str,
             result[test_case_name].append(Action(row.to_dict(), extracted_fields.to_dict()))
 
     return result
+
+
+def pairwise(iterable):
+    """
+    Return successive overlapping pairs taken from the input iterable.
+    pairwise('ABCDEFG') --> AB BC CD DE EF FG
+    """
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)

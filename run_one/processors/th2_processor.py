@@ -14,7 +14,7 @@ from run_one.action_handlers.abstract_action_handler import AbstractActionHandle
 from run_one.action_handlers.context import Context
 from run_one.processors.abstract_processor import AbstractProcessor
 from run_one.util.config import Config
-from run_one.util.util import Action
+from run_one.util.util import Action, pairwise
 
 
 class Th2ProcessorConfig:
