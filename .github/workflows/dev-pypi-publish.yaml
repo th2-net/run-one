@@ -28,10 +28,10 @@ jobs:
         run: echo ${{ steps.release_version.outputs.value }}
       - name: Set custom release version for current build in pyproject.toml
         run: poetry version ${{ steps.release_version.outputs.value }}
-      - name: Set up Python 3.10
+      - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.9'
 #      - name: Run tests
 #        run: |
 #          poetry install

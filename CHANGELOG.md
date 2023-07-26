@@ -1,4 +1,4 @@
-1.0.7
+1.0.7 & 1.0.8
 -----
 
 * Add backward compatibility for `pairwise` method

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from itertools import pairwise, chain
+from itertools import chain
 import logging
 import time
 from typing import TypeVar
