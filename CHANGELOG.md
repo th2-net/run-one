@@ -1,3 +1,8 @@
+1.0.6
+-----
+
+* Change required Python version to 3.9
+
 1.0.5
 -----
 
