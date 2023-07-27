@@ -1,3 +1,8 @@
+1.0.9
+-----
+
+* Move to using `ast.literal_eval` for loading nested fields
+
 1.0.7 & 1.0.8
 -----
 

@@ -1,7 +1,7 @@
+import ast
 from collections import defaultdict
 from datetime import datetime
 from itertools import tee
-import json
 from typing import Callable
 import uuid
 
@@ -76,7 +76,7 @@ def read_csv_matrix(filepath: str,
 
             for field in config.nested_fields:
                 if field in row and row[field] != '*':
-                    row[field] = json.loads(row[field].replace("'", '"'))
+                    row[field] = ast.literal_eval(row[field])
 
             if id_function is not None:
                 for field in config.regenerate_id_fields:
