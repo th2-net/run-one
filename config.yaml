@@ -23,6 +23,7 @@ regenerate_time_fields: ["TransactTime"] # Time-like fields to regenerate
 
 processor_config: # processor config in free form
   th2_configs: "th2_configs" # path to directory with th2 configs
+  root_event_name: 'run-one root event' # name of created root event
   book: "test_book" # book name
   scope: "test_script" # scope name
   use_place_method: False # use th2 act place methods (True) or plain send (False)

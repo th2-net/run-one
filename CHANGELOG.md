@@ -1,3 +1,9 @@
+1.0.10
+-----
+
+* Rework package metadata for ability to install th2-related dependencies separately
+* Add ability to provide root event name for `th2_processor`
+
 1.0.9
 -----
 

@@ -6,8 +6,9 @@ Tool for parsing matrix files, extracting actions and processing them according 
 python -m venv $VENV_PATH
 $VENV_PATH/bin/pip install -U pip setuptools
 $VENV_PATH/bin/pip install poetry
-$VENV_PATH/bin/poetry install
+$VENV_PATH/bin/poetry install -E th2
 ```
+Note: `-E th2` is optional and can be omitted if you don't need th2-related dependencies.
 
 ### Config example (using th2 processor)
 ```yaml
@@ -36,6 +37,7 @@ regenerate_time_fields: ["TransactTime"] # Time-like fields to regenerate
 
 processor_config: # processor config in free form
   th2_configs: "th2_configs" # path to directory with th2 configs
+  root_event_name: 'run-one root event' # name of created root event
   book: "test_book" # book name
   scope: "test_script" # scope name
   use_place_method: False # use th2 act place methods (True) or plain send (False)

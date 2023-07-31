@@ -24,6 +24,10 @@ class Th2ProcessorConfig:
         if 'th2_configs' in kwargs:
             self.th2_configs = kwargs['th2_configs']
 
+        self.root_event_name = 'run-one root event'
+        if 'root_event_name' in kwargs:
+            self.root_event_name = kwargs['root_event_name']
+
         self.book = 'book'
         if 'book' in kwargs:
             self.book = kwargs['book']
@@ -58,7 +62,7 @@ class Th2Processor(AbstractProcessor):
         self._event_router: EventBatchRouter = self._common_factory.event_batch_router  # type: ignore
         self.root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope,
                                              start_timestamp=self.create_timestamp())
-        self.root_event = EventBatch(events=[create_event(name='Run One Root Event',
+        self.root_event = EventBatch(events=[create_event(name=self._config.root_event_name,
                                                           event_id=self.root_event_id,
                                                           event_type='run-one root event')])
         self._event_router.send(self.root_event)
