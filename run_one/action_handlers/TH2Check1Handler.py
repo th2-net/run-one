@@ -12,7 +12,8 @@ from run_one.util.util import Action
 
 class TH2Check1Handler(AbstractActionHandler):
 
-    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter) -> None:
+    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self._config = config
         self._check1_service: Check1Service = grpc_router.get_service(Check1Service)  # type: ignore
 

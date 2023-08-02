@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from itertools import chain
 import logging
 import time
-from typing import TypeVar
+from typing import Callable, TypeVar
 
 from google.protobuf.timestamp_pb2 import Timestamp
 from th2_grpc_common.common_pb2 import EventBatch
@@ -14,7 +14,7 @@ from run_one.action_handlers.abstract_action_handler import AbstractActionHandle
 from run_one.action_handlers.context import Context
 from run_one.processors.abstract_processor import AbstractProcessor
 from run_one.util.config import Config
-from run_one.util.util import Action, pairwise
+from run_one.util.util import Action, generate_time, pairwise
 
 
 class Th2ProcessorConfig:
@@ -46,7 +46,7 @@ class Th2ProcessorConfig:
 
         self.sleep = 0
         if 'sleep' in kwargs:
-            self.sleep = int(kwargs['sleep'])
+            self.sleep = float(kwargs['sleep'])
 
         self.timestamp_shift = 0
         if 'timestamp_shift' in kwargs:
@@ -56,6 +56,7 @@ class Th2ProcessorConfig:
 class Th2Processor(AbstractProcessor):
     def __init__(self, config: Config, processor_config_class=Th2ProcessorConfig):
         self._config = processor_config_class(**config.processor_config)
+        self._regenerate_time_fields = config.regenerate_time_fields
 
         self._common_factory = CommonFactory(config_path=self._config.th2_configs)
 
@@ -83,7 +84,7 @@ class Th2Processor(AbstractProcessor):
         timestamp.FromDatetime(datetime.utcnow() - timedelta(seconds=self._config.timestamp_shift))
         return timestamp
 
-    def process(self, test_cases: dict[str, list[Action]]):
+    def process(self, test_cases: dict[str, list[Action]], time_function: Callable = generate_time):
 
         for test_case_name, actions in test_cases.items():
 
@@ -104,10 +105,12 @@ class Th2Processor(AbstractProcessor):
 
                 self.logger.info(f'Processing {current_action_type} action '
                                  f'with ID = {current_action.extra_data.get("ID", "empty")}, '
-                                 f'message type = {current_action.extra_data.get("MessageType", "none")},'
+                                 f'message type = {current_action.extra_data.get("MessageType", "none")}, '
                                  f'description = {current_action.extra_data.get("Description", "empty")}')
 
                 current_action_handler = self.processed_actions.get(current_action_type)
+
+                current_action.regenerate_time_fields(self._regenerate_time_fields, time_function)
 
                 if previous_action is not None:
                     previous_action_handler = self.processed_actions.get(previous_action.extra_data['Action'])

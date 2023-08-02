@@ -2,7 +2,7 @@ import ast
 from collections import defaultdict
 from datetime import datetime
 from itertools import tee
-from typing import Callable
+from typing import Callable, Iterable, TypeVar
 import uuid
 
 import pandas as pd
@@ -10,6 +10,7 @@ import pandas as pd
 from run_one.util.config import Config
 
 
+_T = TypeVar('_T')
 uid = str(uuid.uuid1())
 counter = 0
 
@@ -22,6 +23,12 @@ class Action:
 
     def __repr__(self) -> str:
         return f'row={self.row}\nextra_data={self.extra_data}'
+
+    def regenerate_time_fields(self, time_fields: list[str], time_function: Callable):
+        time_mapping = {}
+        for field in time_fields:
+            if field in self.row and self.row[field] != '*':
+                self.row[field] = time_mapping.setdefault(self.row[field], time_function())
 
 
 def generate_random_id(value: str = ''):
@@ -38,14 +45,12 @@ def generate_time(time_format: str = '%Y-%m-%dT%H:%M:%S.%fZ'):
 
 def read_csv_matrix(filepath: str,
                     config: Config,
-                    id_function: Callable = generate_random_id,
-                    time_function: Callable = generate_time) -> dict[str, list[Action]]:
+                    id_function: Callable = generate_random_id) -> dict[str, list[Action]]:
     """
     Read matrix file
     :param str filepath: path to matrix file
     :param config: configuration class instance
     :param id_function: function to transform ID-like fields
-    :param time_function: function to transform Time-like fields
     :return: Collection of filtered action_handlers combined by test cases
     """
 
@@ -53,7 +58,7 @@ def read_csv_matrix(filepath: str,
 
     result = defaultdict(list)
     test_case_name = ''
-    id_mapping, time_mapping = {}, {}
+    id_mapping = {}
 
     for index, row in file.iterrows():
 
@@ -63,7 +68,6 @@ def read_csv_matrix(filepath: str,
             continue
         elif seq == 'TEST_CASE_END':
             id_mapping.clear()
-            time_mapping.clear()
             continue
 
         action = row.get('Action')
@@ -88,17 +92,12 @@ def read_csv_matrix(filepath: str,
                         else:
                             row[field] = id_mapping.setdefault(field_value, generate_random_id(field_value))
 
-            if time_function is not None:
-                for field in config.regenerate_time_fields:
-                    if field in row and row[field] != '*':
-                        row[field] = time_mapping.setdefault(row[field], time_function())
-
             result[test_case_name].append(Action(row.to_dict(), extracted_fields.to_dict()))
 
     return result
 
 
-def pairwise(iterable):
+def pairwise(iterable: Iterable[_T]) -> Iterable[tuple[_T]]:
     """
     Return successive overlapping pairs taken from the input iterable.
     pairwise('ABCDEFG') --> AB BC CD DE EF FG

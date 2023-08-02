@@ -1,3 +1,9 @@
+1.0.11
+-----
+
+* Fix `sleep` parameter in `processor_config` section
+* Rework regeneration of time like fields
+
 1.0.10
 -----
 

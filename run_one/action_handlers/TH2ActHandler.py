@@ -12,7 +12,8 @@ from run_one.processors.th2_processor import Th2ProcessorConfig
 
 class TH2ActHandler(AbstractActionHandler):
 
-    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter) -> None:
+    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self._config = config
         self._act_service: ActService = grpc_router.get_service(ActService)  # type: ignore
 

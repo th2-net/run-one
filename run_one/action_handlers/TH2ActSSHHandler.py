@@ -10,7 +10,8 @@ from run_one.util.util import Action
 
 class TH2ActSSHHandler(AbstractActionHandler):
 
-    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter) -> None:
+    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self._config = config
         self._act_ssh_service: ActSshService = grpc_router.get_service(ActSshService)  # type: ignore
 
