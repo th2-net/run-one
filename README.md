@@ -42,6 +42,8 @@ processor_config: # processor config in free form
   scope: "test_script" # scope name
   use_place_method: False # use th2 act place methods (True) or plain send (False)
   key_fields: ["Side", "ClOrdID", "OrigClOrdID"] # list of key fields for th2-check1 request
+  fail_unexpected: False # if set the check1 rule will fail validation if any unexpected field received
+  ignore_fields: ["header", "trailer"] # list of fields to be ignored in the check1 rule validation
   sleep: 1 # delay between each action processing
   timestamp_shift: 1 # for how many seconds to the past make a shift for event timestamps
 ```
