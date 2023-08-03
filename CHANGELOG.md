@@ -1,3 +1,9 @@
+1.0.12
+-----
+
+* Added parameter 'ignore_fields' to set ignored fields in check1 request
+* Added parameter 'fail_unexpected' to fail check1 validation if any unexpected fields received
+
 1.0.11
 -----
 

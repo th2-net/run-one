@@ -2,7 +2,7 @@ from th2_common.schema.grpc.router.grpc_router import GrpcRouter
 from th2_common_utils.converters.filter_converters import FieldFilter, dict_to_root_message_filter
 from th2_grpc_check1.check1_pb2 import CheckRuleRequest
 from th2_grpc_check1.check1_service import Check1Service
-from th2_grpc_common.common_pb2 import Direction, FilterOperation, ConnectionID
+from th2_grpc_common.common_pb2 import Direction, FilterOperation, ConnectionID, ComparisonSettings
 
 from run_one.action_handlers.abstract_action_handler import AbstractActionHandler
 from run_one.action_handlers.context import Context
@@ -43,9 +43,19 @@ class TH2Check1Handler(AbstractActionHandler):
                          else v)
                 message_filter[k] = value
 
+        ignore_fields = self._config.ignore_fields
+        root_message_filter = dict_to_root_message_filter(
+            message_type=message_type,
+            message_filter=message_filter,
+            ignore_fields=ignore_fields if ignore_fields else None)
+
+        if self._config.fail_unexpected:
+            comparison_settings = ComparisonSettings(fail_unexpected=self._config.fail_unexpected)
+            root_message_filter.message_filter.comparison_settings.CopyFrom(comparison_settings)
+
         check_rule_request = CheckRuleRequest(
             connectivity_id=ConnectionID(session_alias=user),
-            root_filter=dict_to_root_message_filter(message_type=message_type, message_filter=message_filter),
+            root_filter=root_message_filter,
             # message_timeout=5000,
             timeout=int(action.extra_data.get('Time', 20000)),
             parent_event_id=Context.get('root_event_id'),
