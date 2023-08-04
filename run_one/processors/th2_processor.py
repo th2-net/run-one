@@ -45,14 +45,12 @@ class Th2ProcessorConfig:
             self.key_fields = kwargs['key_fields']
 
         self.fail_unexpected = False
-        fail_unexpected_key = 'fail_unexpected'
-        if fail_unexpected_key in kwargs:
-            self.fail_unexpected = bool(kwargs[fail_unexpected_key])
+        if 'fail_unexpected' in kwargs:
+            self.fail_unexpected = bool(kwargs['fail_unexpected'])
 
         self.ignore_fields = []
-        ignore_fields_key = 'ignore_fields'
-        if ignore_fields_key in kwargs:
-            self.ignore_fields = kwargs[ignore_fields_key]
+        if 'ignore_fields' in kwargs:
+            self.ignore_fields = kwargs['ignore_fields']
 
         self.sleep = 0
         if 'sleep' in kwargs:

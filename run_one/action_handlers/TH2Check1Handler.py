@@ -30,7 +30,7 @@ class TH2Check1Handler(AbstractActionHandler):
                 message_filter[k] = FieldFilter(operation=FilterOperation.NOT_EMPTY)
 
             elif k in self._config.key_fields:
-                is_not_equal_operation = v.startswith('!=')
+                is_not_equal_operation = v.startswith('!=') if isinstance(v, str) else False
                 message_filter[k] = FieldFilter(
                     value=v[2:] if is_not_equal_operation else v,
                     key=True,

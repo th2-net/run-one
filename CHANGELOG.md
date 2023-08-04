@@ -1,8 +1,13 @@
+1.0.13
+-----
+
+* Fix building field filter for case when field is in `key_fields` and `nested_fields` in `TH2Check1handler`
+
 1.0.12
 -----
 
-* Added parameter 'ignore_fields' to set ignored fields in check1 request
-* Added parameter 'fail_unexpected' to fail check1 validation if any unexpected fields received
+* Add parameter `ignore_fields` to set ignored fields in th2-check1 request
+* Add parameter `fail_unexpected` to fail th2-check1 validation if any unexpected fields received
 
 1.0.11
 -----
