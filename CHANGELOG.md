@@ -1,3 +1,8 @@
+1.0.14
+-----
+
+* Change `key_fields` and `ignore_fields` parameters of `Th2ProcessorConfig` to be a mapping with message types as a keys
+
 1.0.13
 -----
 

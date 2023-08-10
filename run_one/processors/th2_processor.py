@@ -40,15 +40,15 @@ class Th2ProcessorConfig:
         if 'use_place_method' in kwargs:
             self.use_place_method = bool(kwargs['use_place_method'])
 
-        self.key_fields = []
+        self.key_fields = {}
         if 'key_fields' in kwargs:
-            self.key_fields = kwargs['key_fields']
+            self.key_fields = {k: self.transform_fields_mapping(v) for k, v in kwargs['key_fields'].items()}
 
         self.fail_unexpected = False
         if 'fail_unexpected' in kwargs:
             self.fail_unexpected = bool(kwargs['fail_unexpected'])
 
-        self.ignore_fields = []
+        self.ignore_fields = {}
         if 'ignore_fields' in kwargs:
             self.ignore_fields = kwargs['ignore_fields']
 
@@ -59,6 +59,16 @@ class Th2ProcessorConfig:
         self.timestamp_shift = 0
         if 'timestamp_shift' in kwargs:
             self.timestamp_shift = int(kwargs['timestamp_shift'])
+
+    def transform_fields_mapping(self, sequence):
+        result = {}
+        for item in sequence:
+            if isinstance(item, str):
+                result[item] = None
+            if isinstance(item, dict):
+                for k, v in item.items():
+                    result[k] = self.transform_fields_mapping(v)
+        return result
 
 
 class Th2Processor(AbstractProcessor):

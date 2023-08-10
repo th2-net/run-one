@@ -24,18 +24,30 @@ class TH2Check1Handler(AbstractActionHandler):
         cl_ord_id = action.row.get("OrigClOrdID", action.row.get("ClOrdID", "none"))
         user_and_direction = (user, direction, cl_ord_id)
 
+        key_fields_common: dict = self._config.key_fields.get('common', {})
+        key_fields_by_message_type: dict = self._config.key_fields.get(message_type, {})
+        key_fields = key_fields_common | key_fields_by_message_type
+
+        ignore_fields_common: list = self._config.ignore_fields.get('common', [])
+        ignore_fields_by_message_type: list = self._config.ignore_fields.get(message_type, [])
+        ignore_fields = ignore_fields_common.extend(ignore_fields_by_message_type)
+
         message_filter = {}
         for k, v in action.row.items():
             if v == '*':
                 message_filter[k] = FieldFilter(operation=FilterOperation.NOT_EMPTY)
 
-            elif k in self._config.key_fields:
-                is_not_equal_operation = v.startswith('!=') if isinstance(v, str) else False
-                message_filter[k] = FieldFilter(
-                    value=v[2:] if is_not_equal_operation else v,
-                    key=True,
-                    operation=FilterOperation.NOT_EQUAL if is_not_equal_operation else FilterOperation.EQUAL
-                )
+            elif k in key_fields:
+                if isinstance(v, str):
+                    is_not_equal_operation = v.startswith('!=')
+                    message_filter[k] = FieldFilter(
+                        value=v[2:] if is_not_equal_operation else v,
+                        key=True,
+                        operation=FilterOperation.NOT_EQUAL if is_not_equal_operation else FilterOperation.EQUAL
+                    )
+
+                if isinstance(v, dict):
+                    message_filter[k] = {ik: FieldFilter(value=iv, key=ik in key_fields[k]) for ik, iv in v.items()}
 
             else:
                 value = (FieldFilter(value=v[2:], operation=FilterOperation.NOT_EQUAL)
@@ -43,7 +55,6 @@ class TH2Check1Handler(AbstractActionHandler):
                          else v)
                 message_filter[k] = value
 
-        ignore_fields = self._config.ignore_fields
         root_message_filter = dict_to_root_message_filter(
             message_type=message_type,
             message_filter=message_filter,
