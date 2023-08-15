@@ -44,9 +44,9 @@ class Th2ProcessorConfig:
         if 'key_fields' in kwargs:
             self.key_fields = {k: self.transform_fields_mapping(v) for k, v in kwargs['key_fields'].items()}
 
-        self.fail_unexpected = False
+        self.fail_unexpected = 'NO'
         if 'fail_unexpected' in kwargs:
-            self.fail_unexpected = bool(kwargs['fail_unexpected'])
+            self.fail_unexpected = str(kwargs['fail_unexpected'])
 
         self.ignore_fields = {}
         if 'ignore_fields' in kwargs:

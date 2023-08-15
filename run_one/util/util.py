@@ -54,7 +54,7 @@ def read_csv_matrix(filepath: str,
     :return: Collection of filtered action_handlers combined by test cases
     """
 
-    file = pd.read_csv(filepath)
+    file = pd.read_csv(filepath, dtype=str)
 
     result = defaultdict(list)
     test_case_name = ''

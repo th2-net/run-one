@@ -1,3 +1,9 @@
+1.0.15
+-----
+
+* Fix filling `ignore_fields` for th2-check1 request
+* Add proper ability to provide `fail_unexpected` for th2-check1 request
+
 1.0.14
 -----
 

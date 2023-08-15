@@ -34,7 +34,7 @@ processor_config: # processor config in free form
       - "OrigClOrdID"
       - Instrument:
          - "Symbol"
-  fail_unexpected: False # if set the th2-check1 rule will fail validation if any unexpected field received
+  fail_unexpected: "NO" # rule of failing the validation for th2-check1 request if any unexpected field received
   ignore_fields:
     ExecutionReport:  # list of fields to be ignored in the th2-check1 rule validation
       - "header"

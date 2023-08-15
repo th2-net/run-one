@@ -4,8 +4,9 @@ on:
   push:
     branches-ignore:
       - master
-    paths:
-      - pyproject.toml
+    paths-ignore:
+      - README.md
+      - CHANGELOG.md
 
 env:
   DEP_PATH: requirements.txt

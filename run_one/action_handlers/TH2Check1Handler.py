@@ -2,7 +2,7 @@ from th2_common.schema.grpc.router.grpc_router import GrpcRouter
 from th2_common_utils.converters.filter_converters import FieldFilter, dict_to_root_message_filter
 from th2_grpc_check1.check1_pb2 import CheckRuleRequest
 from th2_grpc_check1.check1_service import Check1Service
-from th2_grpc_common.common_pb2 import Direction, FilterOperation, ConnectionID, ComparisonSettings
+from th2_grpc_common.common_pb2 import Direction, FailUnexpected, FilterOperation, ConnectionID, ComparisonSettings
 
 from run_one.action_handlers.abstract_action_handler import AbstractActionHandler
 from run_one.action_handlers.context import Context
@@ -20,7 +20,7 @@ class TH2Check1Handler(AbstractActionHandler):
     def process(self, action: Action):
         message_type = action.extra_data['MessageType']
         user = action.extra_data['User']
-        direction = getattr(Direction, action.extra_data.get('Direction', 'FIRST').upper())
+        direction = getattr(Direction, action.extra_data.get('Direction', 'FIRST').upper(), Direction.FIRST)
         cl_ord_id = action.row.get("OrigClOrdID", action.row.get("ClOrdID", "none"))
         user_and_direction = (user, direction, cl_ord_id)
 
@@ -28,9 +28,9 @@ class TH2Check1Handler(AbstractActionHandler):
         key_fields_by_message_type: dict = self._config.key_fields.get(message_type, {})
         key_fields = key_fields_common | key_fields_by_message_type
 
-        ignore_fields_common: list = self._config.ignore_fields.get('common', [])
+        ignore_fields: list = self._config.ignore_fields.get('common', [])
         ignore_fields_by_message_type: list = self._config.ignore_fields.get(message_type, [])
-        ignore_fields = ignore_fields_common.extend(ignore_fields_by_message_type)
+        ignore_fields.extend(ignore_fields_by_message_type)
 
         message_filter = {}
         for k, v in action.row.items():
@@ -61,7 +61,9 @@ class TH2Check1Handler(AbstractActionHandler):
             ignore_fields=ignore_fields if ignore_fields else None)
 
         if self._config.fail_unexpected:
-            comparison_settings = ComparisonSettings(fail_unexpected=self._config.fail_unexpected)
+            comparison_settings = ComparisonSettings(fail_unexpected=getattr(FailUnexpected,
+                                                                             self._config.fail_unexpected.upper(),
+                                                                             FailUnexpected.NO))
             root_message_filter.message_filter.comparison_settings.CopyFrom(comparison_settings)
 
         check_rule_request = CheckRuleRequest(
