@@ -27,9 +27,10 @@ class AbstractProcessor:
 
         return result
 
-    def process(self, test_cases: dict[str, list[Action]]):
+    def process(self, matrices_data: dict[str, dict[str, list[Action]]]):
         """
         Process test cases
-        :param test_cases: collection of test cases: test case name to list of its actions
+        :param matrices_data: collection of parsed matrices data: matrix file name to test cases data
+                              (test case name to list of its actions)
         """
         pass

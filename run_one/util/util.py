@@ -1,7 +1,8 @@
 import ast
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from itertools import tee
+from pathlib import Path
 from typing import Callable, Iterable, TypeVar
 import uuid
 
@@ -40,12 +41,12 @@ def generate_random_id(value: str = ''):
 
 
 def generate_time(time_format: str = '%Y-%m-%dT%H:%M:%S.%fZ'):
-    return datetime.utcnow().strftime(time_format)
+    return datetime.now(timezone.utc).strftime(time_format)
 
 
 def read_csv_matrix(filepath: str,
                     config: Config,
-                    id_function: Callable = generate_random_id) -> dict[str, list[Action]]:
+                    id_function: Callable = generate_random_id) -> dict[str, dict[str, list[Action]]]:
     """
     Read matrix file
     :param str filepath: path to matrix file
@@ -54,45 +55,57 @@ def read_csv_matrix(filepath: str,
     :return: Collection of filtered action_handlers combined by test cases
     """
 
-    file = pd.read_csv(filepath, dtype=str)
+    path = Path(filepath)
+    if path.is_dir():
+        matrices = sorted(path.glob('*.csv'))
+    elif path.is_file():
+        matrices = [path]
+    else:
+        raise FileNotFoundError('No matrices were found at specified path. Check `matrix_file` config parameter.')
 
-    result = defaultdict(list)
-    test_case_name = ''
-    id_mapping = {}
+    result = {}
+    for matrix in matrices:
+        file = pd.read_csv(matrix, dtype=str)
 
-    for index, row in file.iterrows():
+        data = defaultdict(list)
+        test_case_name = ''
+        id_mapping = {}
 
-        seq = row.get('Seq')
-        if seq == 'TEST_CASE_START':
-            test_case_name = row.get('CaseName')
-            continue
-        elif seq == 'TEST_CASE_END':
-            id_mapping.clear()
-            continue
+        for index, row in file.iterrows():
 
-        action = row.get('Action')
+            seq = row.get('Seq')
+            if seq == 'TEST_CASE_START':
+                test_case_name = row.get('CaseName')
+                continue
+            elif seq == 'TEST_CASE_END':
+                id_mapping.clear()
+                continue
 
-        if action in config.processed_actions:
-            row.dropna(inplace=True)
-            extracted_fields = row.get([field for field in config.fields_to_extract if field in row], [])
-            row.drop(config.fields_to_drop + config.fields_to_extract, errors='ignore', inplace=True)
-            row.rename(config.field_mapping, inplace=True)
+            action = row.get('Action')
 
-            for field in config.nested_fields:
-                if field in row and row[field] != '*':
-                    row[field] = ast.literal_eval(row[field])
+            if action in config.processed_actions:
+                row.dropna(inplace=True)
+                extracted_fields = row.get([field for field in config.fields_to_extract if field in row], [])
+                row.drop(config.fields_to_drop + config.fields_to_extract, errors='ignore', inplace=True)
+                row.rename(config.field_mapping, inplace=True)
 
-            if id_function is not None:
-                for field in config.regenerate_id_fields:
+                for field in config.nested_fields:
                     if field in row and row[field] != '*':
-                        field_value = row[field]
-                        if field_value.startswith('!='):
-                            key = field_value[2:]
-                            row[field] = f'!={id_mapping.setdefault(key, generate_random_id(key))}'
-                        else:
-                            row[field] = id_mapping.setdefault(field_value, generate_random_id(field_value))
+                        row[field] = ast.literal_eval(row[field])
 
-            result[test_case_name].append(Action(row.to_dict(), extracted_fields.to_dict()))
+                if id_function is not None:
+                    for field in config.regenerate_id_fields:
+                        if field in row and row[field] != '*':
+                            field_value = row[field]
+                            if field_value.startswith('!='):
+                                key = field_value[2:]
+                                row[field] = f'!={id_mapping.setdefault(key, id_function(key))}'
+                            else:
+                                row[field] = id_mapping.setdefault(field_value, id_function(field_value))
+
+                data[test_case_name].append(Action(row.to_dict(), extracted_fields.to_dict()))
+
+        result[matrix.stem] = data
 
     return result
 

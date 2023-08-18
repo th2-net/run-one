@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from itertools import chain
 import logging
 import time
@@ -99,51 +99,63 @@ class Th2Processor(AbstractProcessor):
 
     def create_timestamp(self) -> Timestamp:
         timestamp = Timestamp()
-        timestamp.FromDatetime(datetime.utcnow() - timedelta(seconds=self._config.timestamp_shift))
+        timestamp.FromDatetime(datetime.now(timezone.utc) - timedelta(seconds=self._config.timestamp_shift))
         return timestamp
 
-    def process(self, test_cases: dict[str, list[Action]], time_function: Callable = generate_time):
+    def process(self, matrices_data: dict[str, dict[str, list[Action]]], time_function: Callable = generate_time):
 
-        for test_case_name, actions in test_cases.items():
+        for matrix_name, test_cases in matrices_data.items():
 
-            logging.info(f'Processing {test_case_name} test case')
+            logging.info(f'Processing {matrix_name} matrix')
 
-            test_case_root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope,
-                                                      start_timestamp=self.create_timestamp())
-            test_case_event_batch = EventBatch(events=[create_event(name=test_case_name,
-                                                                    event_id=test_case_root_event_id,
-                                                                    parent_id=self.root_event_id,
-                                                                    event_type='Test case root event')])
-            self._event_router.send(test_case_event_batch)
-            Context.set('parent_event_id', test_case_root_event_id)
+            matrix_root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope,
+                                                   start_timestamp=self.create_timestamp())
+            matrix_root_event = EventBatch(events=[create_event(name=matrix_name,
+                                                                event_id=matrix_root_event_id,
+                                                                parent_id=self.root_event_id,
+                                                                event_type='Matrix root event')])
+            self._event_router.send(matrix_root_event)
 
-            for previous_action, current_action in pairwise(chain([None], actions)):
+            for test_case_name, actions in test_cases.items():
 
-                current_action_type = current_action.extra_data['Action']
+                logging.info(f'Processing {test_case_name} test case')
 
-                self.logger.info(f'Processing {current_action_type} action '
-                                 f'with ID = {current_action.extra_data.get("ID", "empty")}, '
-                                 f'message type = {current_action.extra_data.get("MessageType", "none")}, '
-                                 f'description = {current_action.extra_data.get("Description", "empty")}')
+                test_case_root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope,
+                                                          start_timestamp=self.create_timestamp())
+                test_case_event = EventBatch(events=[create_event(name=test_case_name,
+                                                                  event_id=test_case_root_event_id,
+                                                                  parent_id=matrix_root_event_id,
+                                                                  event_type='Test case root event')])
+                self._event_router.send(test_case_event)
+                Context.set('parent_event_id', test_case_root_event_id)
 
-                current_action_handler = self.processed_actions.get(current_action_type)
+                for previous_action, current_action in pairwise(chain([None], actions)):
 
-                current_action.regenerate_time_fields(self._regenerate_time_fields, time_function)
+                    current_action_type = current_action.extra_data['Action']
 
-                if previous_action is not None:
-                    previous_action_handler = self.processed_actions.get(previous_action.extra_data['Action'])
-                    if current_action_handler is not previous_action_handler:
-                        previous_action_handler.on_action_change(previous_action, current_action)
+                    self.logger.info(f'Processing {current_action_type} action '
+                                     f'with ID = {current_action.extra_data.get("ID", "empty")}, '
+                                     f'message type = {current_action.extra_data.get("MessageType", "none")}, '
+                                     f'description = {current_action.extra_data.get("Description", "empty")}')
 
-                if current_action_handler is not None:
-                    current_action_handler.process(action=current_action)
+                    current_action_handler = self.processed_actions.get(current_action_type)
 
-                time.sleep(self._config.sleep)
+                    current_action.regenerate_time_fields(self._regenerate_time_fields, time_function)
 
-            for handler in self.processed_actions.values():
-                handler.on_test_case_end()
+                    if previous_action is not None:
+                        previous_action_handler = self.processed_actions.get(previous_action.extra_data['Action'])
+                        if current_action_handler is not previous_action_handler:
+                            previous_action_handler.on_action_change(previous_action, current_action)
 
-            Context.clear()
+                    if current_action_handler is not None:
+                        current_action_handler.process(action=current_action)
+
+                    time.sleep(self._config.sleep)
+
+                for handler in self.processed_actions.values():
+                    handler.on_test_case_end()
+
+                Context.clear()
 
     def close(self):
         self._common_factory.close()

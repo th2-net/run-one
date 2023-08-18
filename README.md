@@ -12,16 +12,15 @@ Note: `-E th2` is optional and can be omitted if you don't need th2-related depe
 
 ### Config example (using th2 processor)
 ```yaml
-matrix_path: "matrix_case.csv" # path to matrix file
-processed_actions: # which actions to process
+matrix_path: "matrix_case.csv" # path to matrix file or directory with matrices
+processed_actions: # which actions to process (action name to name of handler class)
   send: "TH2ActHandler"
   receive: "TH2Check1Handler"
   sleep: "SleepHandler"
   actSsh: "TH2ActSSHHandler"
 
-field_mapping: # mapping for field renaming
-  OrderQty: "OrderQty"
-  TimeInForce: "TimeInForce"
+field_mapping: # mapping for field renaming (old name to new name)
+  TIF: "TimeInForce"
 
 nested_fields: ["NoPartyIDs", "OrderQtyData", "Parties", "Instrument"] # which fields to convert to collections
 
@@ -41,7 +40,7 @@ processor_config: # processor config in free form
   book: "test_book" # book name
   scope: "test_script" # scope name
   use_place_method: False # use th2 act place methods (True) or plain send (False)
-  key_fields: # list of key fields for th2-check1 request
+  key_fields: # mapping of key fields (message type to list of field names with support of nested fields) for th2-check1 request
     ExecutionReport:
       - "Side"
       - "ClOrdID"
@@ -49,8 +48,8 @@ processor_config: # processor config in free form
       - Instrument:
          - "Symbol"
   fail_unexpected: "NO" # rule of failing the validation for th2-check1 request if any unexpected field received
-  ignore_fields:
-    ExecutionReport:  # list of fields to be ignored in the th2-check1 rule validation 
+  ignore_fields: # mapping of fields (message type to list of field names) to be ignored in the th2-check1 rule validation
+    ExecutionReport:
       - "header"
       - "trailer"
   sleep: 1 # delay between each action processing in seconds

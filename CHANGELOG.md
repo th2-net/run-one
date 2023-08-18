@@ -1,3 +1,10 @@
+1.0.16
+-----
+
+* Make `generate_time` (default function for time-like fields regeneration) to return proper UTC time
+* Fix possibility to pass custom function for regeneration of ID-like fields
+* Add ability to work with directory of matrices
+
 1.0.15
 -----
 
