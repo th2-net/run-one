@@ -1,5 +1,6 @@
 import ast
 from collections import defaultdict
+import csv
 from datetime import datetime, timezone
 from itertools import tee
 from pathlib import Path
@@ -48,11 +49,12 @@ def read_csv_matrix(filepath: str,
                     config: Config,
                     id_function: Callable = generate_random_id) -> dict[str, dict[str, list[Action]]]:
     """
-    Read matrix file
-    :param str filepath: path to matrix file
+    Read matrix file(s)
+    :param str filepath: path to matrix file or directory with matrices
     :param config: configuration class instance
     :param id_function: function to transform ID-like fields
-    :return: Collection of filtered action_handlers combined by test cases
+    :return: matrices_data: collection of parsed matrices data: matrix file name to test cases data
+                            (test case name to list of its actions)
     """
 
     path = Path(filepath)
@@ -69,6 +71,7 @@ def read_csv_matrix(filepath: str,
 
         data = defaultdict(list)
         test_case_name = ''
+        test_case_transformed_ids = {}
         id_mapping = {}
 
         for index, row in file.iterrows():
@@ -78,7 +81,7 @@ def read_csv_matrix(filepath: str,
                 test_case_name = row.get('CaseName')
                 continue
             elif seq == 'TEST_CASE_END':
-                id_mapping.clear()
+                test_case_transformed_ids.clear()
                 continue
 
             action = row.get('Action')
@@ -99,13 +102,19 @@ def read_csv_matrix(filepath: str,
                             field_value = row[field]
                             if field_value.startswith('!='):
                                 key = field_value[2:]
-                                row[field] = f'!={id_mapping.setdefault(key, id_function(key))}'
+                                row[field] = f'!={test_case_transformed_ids.setdefault(key, id_function(key))}'
                             else:
-                                row[field] = id_mapping.setdefault(field_value, id_function(field_value))
+                                row[field] = test_case_transformed_ids.setdefault(field_value, id_function(field_value))
 
                 data[test_case_name].append(Action(row.to_dict(), extracted_fields.to_dict()))
+                id_mapping.update(test_case_transformed_ids)
 
-        result[matrix.stem] = data
+        matrix_name = matrix.stem
+        result[matrix_name] = data
+        with open(f'id_mapping_{matrix_name}.csv', 'w', newline='') as id_mapping_file:
+            csv_writer = csv.DictWriter(id_mapping_file, fieldnames=['old', 'new'])
+            csv_writer.writeheader()
+            csv_writer.writerows({'old': k, 'new': v} for k, v in id_mapping.items())
 
     return result
 

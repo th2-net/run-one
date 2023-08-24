@@ -1,3 +1,8 @@
+1.0.17
+-----
+
+* Add ability to save ID-like fields mapping
+
 1.0.16
 -----
 
