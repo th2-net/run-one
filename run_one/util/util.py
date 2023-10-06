@@ -7,8 +7,6 @@ from pathlib import Path
 from typing import Callable, Iterable, TypeVar
 import uuid
 
-import pandas as pd
-
 from run_one.util.config import Config
 
 
@@ -67,54 +65,64 @@ def read_csv_matrix(filepath: str,
 
     result = {}
     for matrix in matrices:
-        file = pd.read_csv(matrix, dtype=str)
 
-        data = defaultdict(list)
+        test_cases = defaultdict(list)
         test_case_name = ''
         test_case_transformed_ids = {}
         id_mapping = {}
 
-        for index, row in file.iterrows():
+        with open(matrix, 'r', newline='') as file:
+            csv_data = csv.DictReader(file)
+            row: dict
+            for row in csv_data:
 
-            seq = row.get('Seq')
-            if seq == 'TEST_CASE_START':
-                test_case_name = row.get('CaseName')
-                continue
-            elif seq == 'TEST_CASE_END':
-                test_case_transformed_ids.clear()
-                continue
+                seq = row.get('Seq')
+                if seq == 'TEST_CASE_START':
+                    test_case_name = row.get('CaseName')
+                    continue
+                elif seq == 'TEST_CASE_END':
+                    test_case_transformed_ids.clear()
+                    continue
 
-            action = row.get('Action')
+                action = row.get('Action')
 
-            if action in config.processed_actions:
-                row.dropna(inplace=True)
-                extracted_fields = row.get([field for field in config.fields_to_extract if field in row], [])
-                row.drop(config.fields_to_drop + config.fields_to_extract, errors='ignore', inplace=True)
-                row.rename(config.field_mapping, inplace=True)
+                if action in config.processed_actions:
 
-                for field in config.nested_fields:
-                    if field in row and row[field] != '*':
-                        row[field] = ast.literal_eval(row[field])
+                    row = {k: v for k, v in row.items() if v != ''}
 
-                if id_function is not None:
-                    for field in config.regenerate_id_fields:
+                    extracted_fields = {field: row[field] for field in config.fields_to_extract if field in row}
+                    for field in config.fields_to_drop + config.fields_to_extract:
+                        if field in row:
+                            row.pop(field)
+
+                    for old_field, new_field in config.field_mapping.items():
+                        if old_field in row:
+                            row[new_field] = row.pop(old_field)
+
+                    for field in config.nested_fields:
                         if field in row and row[field] != '*':
-                            field_value = row[field]
-                            if field_value.startswith('!='):
-                                key = field_value[2:]
-                                row[field] = f'!={test_case_transformed_ids.setdefault(key, id_function(key))}'
-                            else:
-                                row[field] = test_case_transformed_ids.setdefault(field_value, id_function(field_value))
+                            row[field] = ast.literal_eval(row[field])
 
-                data[test_case_name].append(Action(row.to_dict(), extracted_fields.to_dict()))
-                id_mapping.update(test_case_transformed_ids)
+                    if id_function is not None:
+                        for field in config.regenerate_id_fields:
+                            if field in row and row[field] != '*':
+                                field_value = row[field]
+                                if field_value.startswith('!='):
+                                    key = field_value[2:]
+                                    row[field] = f'!={test_case_transformed_ids.setdefault(key, id_function(key))}'
+                                else:
+                                    row[field] = test_case_transformed_ids.setdefault(field_value,
+                                                                                      id_function(field_value))
 
-        matrix_name = matrix.stem
-        result[matrix_name] = data
-        with open(f'id_mapping_{matrix_name}.csv', 'w', newline='') as id_mapping_file:
-            csv_writer = csv.DictWriter(id_mapping_file, fieldnames=['old', 'new'])
-            csv_writer.writeheader()
-            csv_writer.writerows({'old': k, 'new': v} for k, v in id_mapping.items())
+                    test_cases[test_case_name].append(Action(row, extracted_fields))
+                    id_mapping.update(test_case_transformed_ids)
+
+            matrix_name = matrix.stem
+            result[matrix_name] = test_cases
+            with open(f'id_mapping_{matrix_name}.csv', 'w', newline='') as id_mapping_file:
+                csv_writer = csv.DictWriter(id_mapping_file, fieldnames=['old', 'new'])
+                csv_writer.writeheader()
+                csv_writer.writerows({'old': k, 'new': v} for k, v in id_mapping.items())
 
     return result
 
