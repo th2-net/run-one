@@ -13,6 +13,8 @@ Note: `-E th2` is optional and can be omitted if you don't need th2-related depe
 ### Config example (using th2 processor)
 ```yaml
 matrix_path: "matrix_case.csv" # path to matrix file or directory with matrices
+filename_pattern: "*.matrix.csv" # matching pattern for files (can contain shell-style wildcards)
+
 processed_actions: # which actions to process (action name to name of handler class)
   send: "TH2ActHandler"
   receive: "TH2Check1Handler"

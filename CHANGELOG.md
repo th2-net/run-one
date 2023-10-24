@@ -1,3 +1,14 @@
+1.1.1
+-----
+
+* Add parameter `filename_pattern` to filter files when reading from directory
+* Add try/catch around action processing method
+
+1.1.0
+-----
+
+* Remove pandas usage
+
 1.0.17
 -----
 

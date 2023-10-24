@@ -22,7 +22,7 @@ class Action:
         self.extra_data = extra_data
 
     def __repr__(self) -> str:
-        return f'row={self.row}\nextra_data={self.extra_data}'
+        return f'Action(row={self.row}\nextra_data={self.extra_data})'
 
     def regenerate_time_fields(self, time_fields: list[str], time_function: Callable):
         time_mapping = {}
@@ -57,11 +57,12 @@ def read_csv_matrix(filepath: str,
 
     path = Path(filepath)
     if path.is_dir():
-        matrices = sorted(path.glob('*.csv'))
+        matrices = sorted(path.glob(config.filename_pattern))
     elif path.is_file():
         matrices = [path]
     else:
-        raise FileNotFoundError('No matrices were found at specified path. Check `matrix_file` config parameter.')
+        raise FileNotFoundError('No matrices were found at specified path. '
+                                'Check `matrix_file` and `filename_pattern` config parameters.')
 
     result = {}
     for matrix in matrices:

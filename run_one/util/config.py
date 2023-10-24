@@ -9,6 +9,10 @@ class Config:
         if 'matrix_path' in kwargs:
             self.matrix_path = kwargs['matrix_path']
 
+        self.filename_pattern: str = '*.csv'
+        if 'filename_pattern' in kwargs:
+            self.filename_pattern = kwargs['filename_pattern']
+
         self.processed_actions: dict[str, str] = {'sleep': 'SleepHandler'}
         if 'processed_actions' in kwargs:
             self.processed_actions = kwargs['processed_actions']

@@ -1,4 +1,6 @@
 matrix_path: "matrix_case.csv" # path to matrix file or directory with matrices
+filename_pattern: "*.matrix.csv"
+
 processed_actions: # which actions to process (action name to name of handler class)
   send: "TH2ActHandler"
   receive: "TH2Check1Handler"

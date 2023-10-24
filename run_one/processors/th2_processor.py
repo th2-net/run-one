@@ -148,7 +148,10 @@ class Th2Processor(AbstractProcessor):
                             previous_action_handler.on_action_change(previous_action, current_action)
 
                     if current_action_handler is not None:
-                        current_action_handler.process(action=current_action)
+                        try:
+                            current_action_handler.process(action=current_action)
+                        except Exception:
+                            self.logger.exception(f'Failed to process action {current_action}')
 
                     time.sleep(self._config.sleep)
 
