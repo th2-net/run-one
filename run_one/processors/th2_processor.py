@@ -91,7 +91,8 @@ class Th2Processor(AbstractProcessor):
 
         HandlerType = TypeVar('HandlerType', bound=AbstractActionHandler)
         action_handlers = self.load_action_handlers(config.processed_actions)
-        class_instance_mapping = {x: x(self._config, self._grpc_router) for x in set(action_handlers.values())}
+        class_instance_mapping = {x: x(self._config, self._grpc_router, self._event_router)
+                                  for x in set(action_handlers.values())}
         self.processed_actions: dict[str, HandlerType] = {action: class_instance_mapping[action_handler]
                                                           for action, action_handler in action_handlers.items()}
 

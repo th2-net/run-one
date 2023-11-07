@@ -1,3 +1,4 @@
+from th2_common.schema.event.event_batch_router import EventBatchRouter
 from th2_common.schema.grpc.router.grpc_router import GrpcRouter
 from th2_common_utils import dict_to_message
 from th2_grpc_act_template.act_service import ActService
@@ -12,10 +13,12 @@ from run_one.processors.th2_processor import Th2ProcessorConfig
 
 class TH2ActHandler(AbstractActionHandler):
 
-    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter, *args, **kwargs) -> None:
+    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter, event_router: EventBatchRouter,
+                 *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._config = config
         self._act_service: ActService = grpc_router.get_service(ActService)  # type: ignore
+        self._event_router: EventBatchRouter = event_router
 
     def _get_act_method(self, message_type: str):
         return {'NewOrderSingle': self._act_service.placeOrderFIX,

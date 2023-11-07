@@ -1,3 +1,9 @@
+1.2.0
+-----
+
+* Add ability to send events from action handlers via passing event router
+* Refactor regeneration functions for ID-like and time-like fields to accept current action data
+
 1.1.1
 -----
 
@@ -7,7 +13,7 @@
 1.1.0
 -----
 
-* Remove pandas usage
+* Remove `pandas` usage
 
 1.0.17
 -----

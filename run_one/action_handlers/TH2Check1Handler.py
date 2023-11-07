@@ -1,3 +1,4 @@
+from th2_common.schema.event.event_batch_router import EventBatchRouter
 from th2_common.schema.grpc.router.grpc_router import GrpcRouter
 from th2_common_utils.converters.filter_converters import FieldFilter, dict_to_root_message_filter
 from th2_grpc_check1.check1_pb2 import CheckRuleRequest
@@ -12,10 +13,12 @@ from run_one.util.util import Action
 
 class TH2Check1Handler(AbstractActionHandler):
 
-    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter, *args, **kwargs) -> None:
+    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter, event_router: EventBatchRouter,
+                 *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._config = config
         self._check1_service: Check1Service = grpc_router.get_service(Check1Service)  # type: ignore
+        self._event_router: EventBatchRouter = event_router
 
     def process(self, action: Action):
         message_type = action.extra_data['MessageType']

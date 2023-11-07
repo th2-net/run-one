@@ -11,7 +11,7 @@ from run_one.util.config import Config
 
 
 _T = TypeVar('_T')
-uid = str(uuid.uuid1())
+uid = str(uuid.uuid1()).replace('-', '')
 counter = 0
 
 
@@ -28,18 +28,17 @@ class Action:
         time_mapping = {}
         for field in time_fields:
             if field in self.row and self.row[field] != '*':
-                self.row[field] = time_mapping.setdefault(self.row[field], time_function())
+                self.row[field] = time_mapping.setdefault(self.row[field],
+                                                          time_function(self.row[field], self.row, self.extra_data))
 
 
-def generate_random_id(value: str = ''):
+def generate_random_id(current_value: str, row: dict, extra_data: dict):
     global counter
     counter += 1
-    if not value:
-        return str(uuid.uuid1())
-    return f'{uid[:len(value) - len(str(counter))]}{counter}'
+    return f'{uid[:len(current_value) - len(str(counter))]}{counter}'
 
 
-def generate_time(time_format: str = '%Y-%m-%dT%H:%M:%S.%fZ'):
+def generate_time(current_value: str, row: dict, extra_data: dict, time_format: str = '%Y-%m-%dT%H:%M:%S.%fZ'):
     return datetime.now(timezone.utc).strftime(time_format)
 
 
@@ -110,10 +109,11 @@ def read_csv_matrix(filepath: str,
                                 field_value = row[field]
                                 if field_value.startswith('!='):
                                     key = field_value[2:]
-                                    row[field] = f'!={test_case_transformed_ids.setdefault(key, id_function(key))}'
+                                    row[field] = f'''!={test_case_transformed_ids.setdefault(
+                                        key, id_function(key, row, extracted_fields))}'''
                                 else:
-                                    row[field] = test_case_transformed_ids.setdefault(field_value,
-                                                                                      id_function(field_value))
+                                    row[field] = test_case_transformed_ids.setdefault(
+                                        field_value, id_function(field_value, row, extracted_fields))
 
                     test_cases[test_case_name].append(Action(row, extracted_fields))
                     id_mapping.update(test_case_transformed_ids)

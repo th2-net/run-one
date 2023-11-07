@@ -1,3 +1,4 @@
+from th2_common.schema.event.event_batch_router import EventBatchRouter
 from th2_common.schema.grpc.router.grpc_router import GrpcRouter
 from th2_grpc_act_ssh.act_ssh_pb2 import ExecutionRequest
 from th2_grpc_act_ssh.act_ssh_service import ActSshService
@@ -10,10 +11,12 @@ from run_one.util.util import Action
 
 class TH2ActSSHHandler(AbstractActionHandler):
 
-    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter, *args, **kwargs) -> None:
+    def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter, event_router: EventBatchRouter,
+                 *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._config = config
         self._act_ssh_service: ActSshService = grpc_router.get_service(ActSshService)  # type: ignore
+        self._event_router: EventBatchRouter = event_router
 
     def process(self, action: Action):
         execution_request = ExecutionRequest(endpoint_alias=action.extra_data['User'],
