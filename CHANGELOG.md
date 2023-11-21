@@ -1,3 +1,8 @@
+1.2.1
+-----
+
+* Use `UTF-8` encoding when working with files
+
 1.2.0
 -----
 

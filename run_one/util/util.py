@@ -71,7 +71,7 @@ def read_csv_matrix(filepath: str,
         test_case_transformed_ids = {}
         id_mapping = {}
 
-        with open(matrix, 'r', newline='') as file:
+        with open(matrix, 'r', newline='', encoding='utf-8') as file:
             csv_data = csv.DictReader(file)
             row: dict
             for row in csv_data:
@@ -120,7 +120,7 @@ def read_csv_matrix(filepath: str,
 
             matrix_name = matrix.stem
             result[matrix_name] = test_cases
-            with open(f'id_mapping_{matrix_name}.csv', 'w', newline='') as id_mapping_file:
+            with open(f'id_mapping_{matrix_name}.csv', 'w', newline='', encoding='utf-8') as id_mapping_file:
                 csv_writer = csv.DictWriter(id_mapping_file, fieldnames=['old', 'new'])
                 csv_writer.writeheader()
                 csv_writer.writerows({'old': k, 'new': v} for k, v in id_mapping.items())
