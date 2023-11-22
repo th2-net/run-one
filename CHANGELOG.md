@@ -1,3 +1,8 @@
+1.2.2
+-----
+
+* Change `SleepHandler` to take values in seconds
+
 1.2.1
 -----
 
