@@ -18,6 +18,7 @@ filename_pattern: "*.matrix.csv" # matching pattern for files (can contain shell
 processed_actions: # which actions to process (action name to name of handler class)
   send: "TH2ActHandler"
   receive: "TH2Check1Handler"
+  store: "TH2EstoreHandler"
   sleep: "SleepHandler"
   actSsh: "TH2ActSSHHandler"
 

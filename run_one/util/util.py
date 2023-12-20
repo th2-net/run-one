@@ -1,11 +1,13 @@
 import ast
 from collections import defaultdict
 import csv
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from itertools import tee
 from pathlib import Path
 from typing import Callable, Iterable, TypeVar
 import uuid
+
+from google.protobuf.timestamp_pb2 import Timestamp
 
 from run_one.util.config import Config
 
@@ -40,6 +42,12 @@ def generate_random_id(current_value: str, row: dict, extra_data: dict):
 
 def generate_time(current_value: str, row: dict, extra_data: dict, time_format: str = '%Y-%m-%dT%H:%M:%S.%fZ'):
     return datetime.now(timezone.utc).strftime(time_format)
+
+
+def create_timestamp(timestamp_shift) -> Timestamp:
+    timestamp = Timestamp()
+    timestamp.FromDatetime(datetime.now(timezone.utc) - timedelta(seconds=timestamp_shift))
+    return timestamp
 
 
 def read_csv_matrix(filepath: str,

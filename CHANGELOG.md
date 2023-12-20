@@ -1,3 +1,8 @@
+1.2.3
+-----
+
+* Add handler for `store` actions which sends events to `th2-estore`
+
 1.2.2
 -----
 

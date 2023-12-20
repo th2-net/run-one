@@ -1,10 +1,8 @@
-from datetime import datetime, timedelta, timezone
 from itertools import chain
 import logging
 import time
 from typing import Callable, TypeVar
 
-from google.protobuf.timestamp_pb2 import Timestamp
 from th2_grpc_common.common_pb2 import EventBatch
 from th2_common.schema.event.event_batch_router import EventBatchRouter
 from th2_common.schema.factory.common_factory import CommonFactory
@@ -14,7 +12,7 @@ from run_one.action_handlers.abstract_action_handler import AbstractActionHandle
 from run_one.action_handlers.context import Context
 from run_one.processors.abstract_processor import AbstractProcessor
 from run_one.util.config import Config
-from run_one.util.util import Action, generate_time, pairwise
+from run_one.util.util import Action, create_timestamp, generate_time, pairwise
 
 
 class Th2ProcessorConfig:
@@ -80,7 +78,7 @@ class Th2Processor(AbstractProcessor):
 
         self._event_router: EventBatchRouter = self._common_factory.event_batch_router  # type: ignore
         self.root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope,
-                                             start_timestamp=self.create_timestamp())
+                                             start_timestamp=create_timestamp(self._config.timestamp_shift))
         self.root_event = EventBatch(events=[create_event(name=self._config.root_event_name,
                                                           event_id=self.root_event_id,
                                                           event_type='run-one root event')])
@@ -98,11 +96,6 @@ class Th2Processor(AbstractProcessor):
 
         self.logger = logging.getLogger()
 
-    def create_timestamp(self) -> Timestamp:
-        timestamp = Timestamp()
-        timestamp.FromDatetime(datetime.now(timezone.utc) - timedelta(seconds=self._config.timestamp_shift))
-        return timestamp
-
     def process(self, matrices_data: dict[str, dict[str, list[Action]]], time_function: Callable = generate_time):
 
         for matrix_name, test_cases in matrices_data.items():
@@ -110,7 +103,7 @@ class Th2Processor(AbstractProcessor):
             logging.info(f'Processing {matrix_name} matrix')
 
             matrix_root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope,
-                                                   start_timestamp=self.create_timestamp())
+                                                   start_timestamp=create_timestamp(self._config.timestamp_shift))
             matrix_root_event = EventBatch(events=[create_event(name=matrix_name,
                                                                 event_id=matrix_root_event_id,
                                                                 parent_id=self.root_event_id,
@@ -122,7 +115,8 @@ class Th2Processor(AbstractProcessor):
                 logging.info(f'Processing {test_case_name} test case')
 
                 test_case_root_event_id = create_event_id(book_name=self._config.book, scope=self._config.scope,
-                                                          start_timestamp=self.create_timestamp())
+                                                          start_timestamp=create_timestamp(self._config.timestamp_shift)
+                                                          )
                 test_case_event = EventBatch(events=[create_event(name=test_case_name,
                                                                   event_id=test_case_root_event_id,
                                                                   parent_id=matrix_root_event_id,
