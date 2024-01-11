@@ -1,3 +1,8 @@
+1.2.4
+-----
+
+* Add ability to read CSV files with large size fields
+
 1.2.3
 -----
 

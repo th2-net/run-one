@@ -1,6 +1,7 @@
 import ast
 from collections import defaultdict
 import csv
+import ctypes
 from datetime import datetime, timedelta, timezone
 from itertools import tee
 from pathlib import Path
@@ -70,6 +71,8 @@ def read_csv_matrix(filepath: str,
     else:
         raise FileNotFoundError('No matrices were found at specified path. '
                                 'Check `matrix_file` and `filename_pattern` config parameters.')
+
+    csv.field_size_limit(ctypes.c_ulong(-1).value // 2)
 
     result = {}
     for matrix in matrices:
