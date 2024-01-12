@@ -1,3 +1,8 @@
+1.2.5
+-----
+
+* Fix class name for `store` action handler
+
 1.2.4
 -----
 

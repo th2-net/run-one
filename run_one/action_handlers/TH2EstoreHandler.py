@@ -9,7 +9,7 @@ from run_one.processors.th2_processor import Th2ProcessorConfig
 from run_one.util.util import Action, create_timestamp
 
 
-class TH2EStoreHandler(AbstractActionHandler):
+class TH2EstoreHandler(AbstractActionHandler):
 
     def __init__(self, config: Th2ProcessorConfig, grpc_router: GrpcRouter, event_router: EventBatchRouter,
                  *args, **kwargs) -> None:
