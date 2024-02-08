@@ -1,3 +1,5 @@
+import json
+
 from th2_common.schema.event.event_batch_router import EventBatchRouter
 from th2_common.schema.grpc.router.grpc_router import GrpcRouter
 from th2_common_utils import create_event, create_event_id
@@ -26,5 +28,5 @@ class TH2EstoreHandler(AbstractActionHandler):
                                                            event_id=action_event_id,
                                                            parent_id=parent_event_id,
                                                            event_type='Action event',
-                                                           body=action.row)])
+                                                           body=json.dumps(action.row).encode('utf-8'))])
             self._event_router.send(action_event)

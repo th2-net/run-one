@@ -1,3 +1,8 @@
+1.2.6
+-----
+
+* Change event body format in `TH2EstoreHandler`
+
 1.2.5
 -----
 
