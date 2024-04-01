@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from itertools import chain
 import logging
 import time
@@ -96,9 +97,14 @@ class Th2Processor(AbstractProcessor):
 
         self.logger = logging.getLogger()
 
-    def process(self, matrices_data: dict[str, dict[str, list[Action]]], time_function: Callable = generate_time):
+    def process(self, matrices_data: dict[str, dict[str, list[Action]]],
+                time_function: Callable = generate_time) -> list[tuple[datetime, datetime]]:
+
+        processing_times = []
 
         for matrix_name, test_cases in matrices_data.items():
+
+            start = datetime.now(timezone.utc)
 
             logging.info(f'Processing {matrix_name} matrix')
 
@@ -154,6 +160,11 @@ class Th2Processor(AbstractProcessor):
                     handler.on_test_case_end()
 
                 Context.clear()
+
+            end = datetime.now(timezone.utc)
+            processing_times.append((start, end))
+
+        return processing_times
 
     def close(self):
         self._common_factory.close()

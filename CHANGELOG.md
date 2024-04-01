@@ -1,3 +1,8 @@
+1.2.7
+-----
+
+* Make `process` function return list of tuples of processing start and end times for each matrix file
+
 1.2.6
 -----
 

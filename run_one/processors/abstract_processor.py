@@ -1,3 +1,4 @@
+from datetime import datetime
 from importlib import import_module
 from typing import Type
 
@@ -27,10 +28,11 @@ class AbstractProcessor:
 
         return result
 
-    def process(self, matrices_data: dict[str, dict[str, list[Action]]]):
+    def process(self, matrices_data: dict[str, dict[str, list[Action]]]) -> list[tuple[datetime, datetime]]:
         """
         Process test cases
         :param matrices_data: collection of parsed matrices data: matrix file name to test cases data
                               (test case name to list of its actions)
+        :return: List of datetime tuples: processing start and end times for each matrix file
         """
         pass
