@@ -1,3 +1,8 @@
+1.2.8
+-----
+
+* Add `matrix_delay` (delay between each matrix processing in seconds) parameter to `processor_config` section of configuration file
+
 1.2.7
 -----
 

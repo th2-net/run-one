@@ -56,5 +56,6 @@ processor_config: # processor config in free form
       - "header"
       - "trailer"
   sleep: 1 # delay between each action processing in seconds
+  matrix_delay: 5 # delay between each matrix processing in seconds
   timestamp_shift: 1 # for how many seconds to the past make a shift for event timestamps
 ```

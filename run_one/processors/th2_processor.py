@@ -55,6 +55,10 @@ class Th2ProcessorConfig:
         if 'sleep' in kwargs:
             self.sleep = float(kwargs['sleep'])
 
+        self.matrix_delay = 0
+        if 'matrix_delay' in kwargs:
+            self.matrix_delay = float(kwargs['matrix_delay'])
+
         self.timestamp_shift = 0
         if 'timestamp_shift' in kwargs:
             self.timestamp_shift = int(kwargs['timestamp_shift'])
@@ -163,6 +167,8 @@ class Th2Processor(AbstractProcessor):
 
             end = datetime.now(timezone.utc)
             processing_times.append((start, end))
+
+            time.sleep(self._config.matrix_delay)
 
         return processing_times
 
