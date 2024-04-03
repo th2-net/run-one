@@ -1,3 +1,9 @@
+1.2.9
+-----
+
+* Change logic of `matrix_delay` - sleep before getting end time
+* Make `process` function return list of tuples of matrix_name, processing start and end times for each matrix file
+
 1.2.8
 -----
 
