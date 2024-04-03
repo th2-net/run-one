@@ -165,10 +165,12 @@ class Th2Processor(AbstractProcessor):
 
                 Context.clear()
 
+            if self._config.matrix_delay:
+                self.logger.info(f"Sleeping for {self._config.matrix_delay} before next matrix")
+                time.sleep(self._config.matrix_delay)
+            
             end = datetime.now(timezone.utc)
-            processing_times.append((start, end))
-
-            time.sleep(self._config.matrix_delay)
+            processing_times.append((matrix_name, start, end))
 
         return processing_times
 
